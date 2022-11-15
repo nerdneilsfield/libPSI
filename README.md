@@ -12,7 +12,24 @@ Protocols:
  * Semi-Honest Secure [Mea86](http://ieeexplore.ieee.org/document/6234849/) base on public key crypto (ECC)
  * Semi-Honest Secure [DRRT18](https://eprint.iacr.org/2018/579.pdf) based on cuckoo hashing, PIR and OTs (fastest unbalanced)
  
-## Install
+## Install (Use makefile)
+
+```
+git clone https://github.com/nerdneilsfield/libPSI
+cd libPSI
+
+# compile
+make 
+
+# test
+make test-all
+
+# clean
+make clean
+```
+
+
+## Install (OLD)
 
 Our library is cross platform and has been tested on both Windows and Linux. The library should work on Mac but it has not been tested. There are several library dependencies including [libOTe](https://github.com/osu-crypto/libOte). 
 
