@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 3.18)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project("libPSI" VERSION 1.0.0)
 
 # sets some variables
