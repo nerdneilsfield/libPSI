@@ -9,6 +9,8 @@
 
 #include <cryptoTools/Common/Timer.h>
 #include <algorithm>
+#include <memory>
+#include <random>
 namespace osuCrypto {
 void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 serverSetSize, u64 clientSetSize, block seed, double binScaler, u64 bigBlockSize)
 {
@@ -20,8 +22,9 @@ void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 ser
   mServerId = serverId;
   mBigBlockSize = bigBlockSize;
 
-  if (mIndex.mParams.mN != serverSetSize)
+  if (mIndex.mParams.mN != serverSetSize) {
     throw std::runtime_error(LOCATION);
+  }
 
   // setCuckooParam(serverSetSize, ssp);
 
@@ -32,8 +35,9 @@ void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 ser
   if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv balls_bins start");
   mBinSize = SimpleIndex::get_bin_size(mNumSimpleBins, numBalls, ssp);
 
-  if (mNumSimpleBins == 1 && mBinSize != numBalls)
+  if (mNumSimpleBins == 1 && mBinSize != numBalls) {
     throw std::runtime_error(LOCATION);
+  }
 
   auto serverPsiInputSize = mBinSize * mNumSimpleBins * mBigBlockSize;
   if (serverId == 0) {
@@ -49,14 +53,21 @@ void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 ser
 
     PRNG prng(rSeed ^ OneBlock);
 
-    std::vector<u32> pi1(serverPsiInputSize), sigma(mIndex.mParams.mNumHashes);
-    for (u32 i = 0; i < sigma.size(); ++i) sigma[i] = i;
-    for (u32 i = 0; i < pi1.size(); ++i) pi1[i] = i;
-    std::random_shuffle(pi1.begin(), pi1.end(), prng);
+    std::vector<u32> pi1(serverPsiInputSize);
+    std::vector<u32> sigma(mIndex.mParams.mNumHashes);
+    for (u32 i = 0; i < sigma.size(); ++i) {
+      sigma[i] = i;
+    }
+    for (u32 i = 0; i < pi1.size(); ++i) {
+      pi1[i] = i;
+    }
+    std::shuffle(pi1.begin(), pi1.end(), std::mt19937(std::random_device()()));
 
     std::vector<block>
-      r(serverPsiInputSize),
-      s(serverPsiInputSize),
+      r(serverPsiInputSize);
+    std::vector<block>
+      s(serverPsiInputSize);
+    std::vector<block>
       // piS1(serverPsiInputSize),
       pi1SigmaRS(serverPsiInputSize);
 
@@ -70,7 +81,7 @@ void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 ser
 
     auto rIter = r.begin();
     for (u64 i = 0; i < mClientSetSize; ++i) {
-      std::random_shuffle(sigma.begin(), sigma.end(), prng);
+      std::shuffle(sigma.begin(), sigma.end(), std::mt19937(std::random_device()()));
       for (u64 j = 1; j < sigma.size(); ++j) {
         std::swap(rIter[j], rIter[sigma[j]]);
       }
@@ -85,7 +96,9 @@ void DrrnPsiServer::init(u8 serverId, Channel clientChl, Channel srvChl, u64 ser
     srvChl.asyncSend(std::move(pi1SigmaRS));
   }
 
-  if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv.init.end");
+  if (mServerId == 0) {
+    gTimer.setTimePoint("Drrn_Srv.init.end");
+  }
 }
 
 // void DrrnPsiServer::setCuckooParam(osuCrypto::u64 &serverSetSize, int ssp)
@@ -103,11 +116,13 @@ void DrrnPsiServer::setInputs(span<block> inputs, u64 numHash, u64 ssp)
 
 
   mHashingSeed = ZeroBlock;// todo, make random;
-  if (mIndex.mBins.size()) throw std::runtime_error(LOCATION);
+  if (mIndex.mBins.size() != 0u) {
+    throw std::runtime_error(LOCATION);
+  }
   mIndex.init(CuckooIndex<>::selectParams(inputs.size(), ssp, 0, numHash));
   // std::cout << mIndex.mParams.mN << " " << mIndex.mParams.mBinScaler << std::endl;
 
-  mCuckooDataPtr.reset(new Item[inputs.size()]);
+  mCuckooDataPtr = std::make_unique<Item[]>(inputs.size());
   mCuckooData = span<Item>(mCuckooDataPtr.get(), inputs.size());
 
 
@@ -119,7 +134,7 @@ void DrrnPsiServer::setInputs(span<block> inputs, u64 numHash, u64 ssp)
   for (u64 i = 0; i < mIndex.mBins.size(); ++i) {
     auto &item = mIndex.mBins[i];
     auto empty = item.isEmpty();
-    if (empty == false) {
+    if (!empty) {
       auto idx = item.idx();
       iter->mCuckooIdx = static_cast<u32>(i);
       iter->mVal = inputs[idx];
@@ -169,8 +184,9 @@ struct DrrnBin
 
   void eval(span<DrrnPsiServer::Item> items, span<block> output, u32 tableSize)
   {
-    if (tableSize % mBlockSize != 0)
+    if (tableSize % mBlockSize != 0) {
       throw std::runtime_error(LOCATION);
+    }
 
     mRecvFutr.get();
 
@@ -203,7 +219,7 @@ struct DrrnBin
         // get the bits for this big block.
         {
           auto bits = mk.yeild();
-          auto bitsIter = bits.data();
+          auto *bitsIter = bits.data();
 
           auto expandedBitsIter = expandedBits.data();
           for (u32 j = 0; j < numSteps; ++j) {
@@ -250,7 +266,7 @@ struct DrrnBin
           inIter != items.end() && inIter->mCuckooIdx < endIdx) {
           block &pirData_i = inIter->mVal;
           ++inIter;
-          auto expandedBitsIter = expandedBits.data();
+          auto *expandedBitsIter = expandedBits.data();
 
           for (u32 j = 0; j < numSteps; ++j) {
 
@@ -311,19 +327,25 @@ struct DrrnBin
 void DrrnPsiServer::send(Channel clientChl, Channel srvChl, u64 numThreads)
 {
   // numThreads = 1;
-  if (numThreads == 0) numThreads = std::thread::hardware_concurrency();
+  if (numThreads == 0) {
+    numThreads = std::thread::hardware_concurrency();
+  }
 
 
   u64 cuckooSlotsPerBin = (mIndex.mBins.size() + mNumSimpleBins) / mNumSimpleBins;
 
-  if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv.send.start");
+  if (mServerId == 0) {
+    gTimer.setTimePoint("Drrn_Srv.send.start");
+  }
 
   // power of 2
   u64 numLeafBlocksPerBin = (cuckooSlotsPerBin + mBigBlockSize * 128 - 1) / (mBigBlockSize * 128);
   u64 gDepth = 2;
   u64 kDepth = std::max<u64>(gDepth, log2floor(numLeafBlocksPerBin)) - gDepth;
   u64 groupSize = (numLeafBlocksPerBin + (u64(1) << kDepth) - 1) / (u64(1) << kDepth);
-  if (groupSize > 8) throw std::runtime_error(LOCATION);
+  if (groupSize > 8) {
+    throw std::runtime_error(LOCATION);
+  }
 
 
   std::vector<block> shares(mNumSimpleBins * mBinSize * mBigBlockSize);
@@ -368,21 +390,25 @@ void DrrnPsiServer::send(Channel clientChl, Channel srvChl, u64 numThreads)
   };
 
 
-  if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv.query");
+  if (mServerId == 0) {
+    gTimer.setTimePoint("Drrn_Srv.query");
+  }
 
   std::vector<std::thread> thrds(numThreads - 1);
-  for (u64 i = 1; i < numThreads; ++i)
+  for (u64 i = 1; i < numThreads; ++i) {
     thrds[i - 1] = std::thread([i, &routine]() { routine(i); });
+  }
 
   routine(0);
 
-  for (u64 i = 1; i < numThreads; ++i)
+  for (u64 i = 1; i < numThreads; ++i) {
     thrds[i - 1].join();
+  }
 
   if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv.psi");
 
 
-  if (mServerId) {
+  if (mServerId != 0u) {
 
     auto piSIter = mPiS1.begin();
     for (u64 j = 0; piSIter != mPiS1.end(); ++piSIter, ++j) {
@@ -393,7 +419,8 @@ void DrrnPsiServer::send(Channel clientChl, Channel srvChl, u64 numThreads)
     // srvChl.asyncSend(std::move(piS1));
   } else {
     std::vector<u32> pi0(shares.size());
-    std::vector<block> piS0(shares.size()), piSigmaR0(shares.size());
+    std::vector<block> piS0(shares.size());
+    std::vector<block> piSigmaR0(shares.size());
     clientChl.recv((u8 *)pi0.data(), pi0.size() * sizeof(u32));
     clientChl.recv(piS0);
     gTimer.setTimePoint("Drrn_Srv.recv_client_perm");
@@ -421,20 +448,25 @@ void DrrnPsiServer::send(Channel clientChl, Channel srvChl, u64 numThreads)
     mPsi.sendInput(shares, clientChl);
   }
 
-  if (mServerId == 0) gTimer.setTimePoint("Drrn_Srv.send_done");
+  if (mServerId == 0) {
+    gTimer.setTimePoint("Drrn_Srv.send_done");
+  }
 }
 u64 DrrnPsiServer::find(u64 cuckooIdx)
 {
-  i64 left = 0, right = mCuckooData.size() - 1;
+  i64 left = 0;
+  i64 right = mCuckooData.size() - 1;
   u64 ret = -1;
   while (left <= right) {
     auto m = (left + right) / 2;
 
-    if (m >= mCuckooData.size())
+    if (m >= mCuckooData.size()) {
       throw std::runtime_error(LOCATION);
+    }
 
-    if (m < 0)
+    if (m < 0) {
       throw std::runtime_error(LOCATION);
+    }
 
     if (mCuckooData[m].mCuckooIdx < cuckooIdx) {
       left = m + 1;
@@ -446,8 +478,9 @@ u64 DrrnPsiServer::find(u64 cuckooIdx)
     }
   }
 
-  if (ret == u64(-1))
+  if (ret == u64(-1)) {
     ret = left;
+  }
 
 
   // if (ret)

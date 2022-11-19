@@ -40,8 +40,9 @@ void DrrnPsiClient::init(
 
 void DrrnPsiClient::recv(Channel s0, Channel s1, span<block> inputs)
 {
-  if (inputs.size() != mClientSetSize)
+  if (inputs.size() != mClientSetSize) {
     throw std::runtime_error(LOCATION);
+  }
 
   Matrix<u64> bins(mNumSimpleBins, mBinSize);
   std::vector<u64> binSizes(mNumSimpleBins);
@@ -81,7 +82,9 @@ void DrrnPsiClient::recv(Channel s0, Channel s1, span<block> inputs)
   u64 gDepth = 2;
   u64 kDepth = std::max<u64>(gDepth, log2floor(numLeafBlocks)) - gDepth;
   u64 groupSize = (numLeafBlocks + (u64(1) << kDepth) - 1) / (u64(1) << kDepth);
-  if (groupSize > 8) throw std::runtime_error(LOCATION);
+  if (groupSize > 8) {
+    throw std::runtime_error(LOCATION);
+  }
 
   // std::cout << "kDepth:   " << kDepth << std::endl;
   // std::cout << "mBinSize: " << mBinSize << std::endl;
@@ -94,7 +97,10 @@ void DrrnPsiClient::recv(Channel s0, Channel s1, span<block> inputs)
   AES rGen(rSeed);
 
 
-  std::vector<block> shares(mClientSetSize * mCuckooParams.mNumHashes), r(permSize), piS1(permSize), s(permSize);
+  std::vector<block> shares(mClientSetSize * mCuckooParams.mNumHashes);
+  std::vector<block> r(permSize);
+  std::vector<block> piS1(permSize);
+  std::vector<block> s(permSize);
   // std::vector<u32> rIdxs(numQueries);
   // std::vector<u64> sharesIdx(shares.size());
 
@@ -107,7 +113,8 @@ void DrrnPsiClient::recv(Channel s0, Channel s1, span<block> inputs)
   // auto encIter = enc.begin();
   auto shareIter = shares.begin();
   // auto shareIdxIter = sharesIdx.begin();
-  u64 queryIdx = 0, dummyPermIdx = mClientSetSize * mCuckooParams.mNumHashes;
+  u64 queryIdx = 0;
+  u64 dummyPermIdx = mClientSetSize * mCuckooParams.mNumHashes;
 
   std::unordered_map<u64, u64> inputMap;
   inputMap.reserve(mClientSetSize * mCuckooParams.mNumHashes);
@@ -118,22 +125,27 @@ void DrrnPsiClient::recv(Channel s0, Channel s1, span<block> inputs)
 
   u64 keySize = kDepth + 1 + groupSize;
   u64 mask = (u64(1) << 56) - 1;
-  auto binIter = bins.begin();
+  auto *binIter = bins.begin();
   for (u64 bIdx = 0; bIdx < mNumSimpleBins; ++bIdx) {
     u64 i = 0;
 
     auto binOffset = (bIdx * numCuckooBins + mNumSimpleBins - 1) / mNumSimpleBins;
 
-    std::vector<block> k0(keySize * mBinSize), k1(keySize * mBinSize);
+    std::vector<block> k0(keySize * mBinSize);
+    std::vector<block> k1(keySize * mBinSize);
     // std::vector<u64> idx0(mBinSize), idx1(mBinSize);
-    auto k0Iter = k0.data(), k1Iter = k1.data();
+    auto k0Iter = k0.data();
+    auto k1Iter = k1.data();
     // auto idx0Iter = idx0.data(), idx1Iter = idx1.data();
 
     for (; i < binSizes[bIdx]; ++i) {
       span<block>
-        kk0(k0Iter, kDepth + 1),
-        g0(k0Iter + kDepth + 1, groupSize),
-        kk1(k1Iter, kDepth + 1),
+        kk0(k0Iter, kDepth + 1);
+      span<block>
+        g0(k0Iter + kDepth + 1, groupSize);
+      span<block>
+        kk1(k1Iter, kDepth + 1);
+      span<block>
         g1(k1Iter + kDepth + 1, groupSize);
 
       k0Iter += keySize;
