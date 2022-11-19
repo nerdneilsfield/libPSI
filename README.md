@@ -26,6 +26,9 @@ make test_all
 
 # clean
 make clean
+
+# format code
+make format
 ```
 
 
