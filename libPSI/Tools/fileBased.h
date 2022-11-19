@@ -29,39 +29,35 @@
 #include "libPSI/MPSI/DKT/DktMPsiSender.h"
 
 
-namespace osuCrypto
-{
+namespace osuCrypto {
 
 
-	std::ifstream::pos_type filesize(std::ifstream& file);
+std::ifstream::pos_type filesize(std::ifstream &file);
 
-	bool hasSuffix(std::string const& value, std::string const& ending);
+bool hasSuffix(std::string const &value, std::string const &ending);
 
-	bool isHexBlock(const std::string& buff);
-	block hexToBlock(const std::string& buff);
+bool isHexBlock(const std::string &buff);
+block hexToBlock(const std::string &buff);
 
-	enum class FileType
-	{
-		Bin,
-		Csv,
-		Unspecified
-	};
+enum class FileType {
+  Bin,
+  Csv,
+  Unspecified
+};
 
-	enum class Role {
-		Sender = 0,
-		Receiver = 1,
-		Invalid
-	};
+enum class Role {
+  Sender = 0,
+  Receiver = 1,
+  Invalid
+};
 
-	std::vector<block> readSet(const std::string& path, FileType ft, bool debug);
+std::vector<block> readSet(const std::string &path, FileType ft, bool debug);
 
-	void writeOutput(std::string outPath, FileType ft, const std::vector<u64>& intersection);
-
+void writeOutput(std::string outPath, FileType ft, const std::vector<u64> &intersection);
 
 
-	void padSmallSet(std::vector<block>& set, u64& theirSize, const CLP& cmd);
+void padSmallSet(std::vector<block> &set, u64 &theirSize, const CLP &cmd);
 
-	void doFilePSI(const CLP& cmd);
+void doFilePSI(const CLP &cmd);
 
-}
-
+}// namespace osuCrypto

@@ -20,34 +20,28 @@
 #include <libPSI/Tools/SimpleIndex.h>
 
 
-namespace osuCrypto
+namespace osuCrypto {
+
+class DrrnPsiClient
 {
+public:
+  void init(Channel s0, Channel s1, u64 serverSetSize, u64 clientSetSize, block seed, u64 numHash = 2, double binScaler = 1, u64 cuckooSsp = 20, u64 bigBlockSize = 8);
 
-    class DrrnPsiClient
-    {
-    public:
+  void recv(Channel s0, Channel s1, span<block> inputs);
 
-        void init(Channel s0, Channel s1, u64 serverSetSize, u64 clientSetSize, block seed,
-			u64 numHash = 2,
-			double binScaler = 1, 
-			u64 cuckooSsp = 20,
-			u64 bigBlockSize = 8);
+  PRNG mPrng;
+  CuckooParam mCuckooParams;
 
-        void recv(Channel s0, Channel s1, span<block> inputs);
+  // Matr
+  // SimpleIndex mSimpleIndex;
 
-        PRNG mPrng;
-        CuckooParam mCuckooParams;
+  KkrtPsiReceiver mPsi;
 
-        //Matr
-        //SimpleIndex mSimpleIndex;
+  u64 mClientSetSize, mServerSetSize, mNumSimpleBins, mBinSize, mBigBlockSize;
+  std::unordered_set<u64> mIntersection;
+  KkrtNcoOtReceiver otRecv;
+  block mHashingSeed;
+};
 
-        KkrtPsiReceiver mPsi;
-
-        u64 mClientSetSize, mServerSetSize, mNumSimpleBins, mBinSize, mBigBlockSize;
-		std::unordered_set<u64> mIntersection;
-        KkrtNcoOtReceiver otRecv;
-        block mHashingSeed;
-    };
-
-}
+}// namespace osuCrypto
 #endif

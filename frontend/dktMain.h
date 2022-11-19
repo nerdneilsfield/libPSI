@@ -1,13 +1,10 @@
 #pragma once
 
 
-
-
-#include <vector> 
+#include <vector>
 #include "cryptoTools/Common/Defines.h"
 #include "util.h"
 
 
-void DktSend(LaunchParams& params);
-void DktRecv(LaunchParams& params);
-
+void DktSend(LaunchParams &params);
+void DktRecv(LaunchParams &params);

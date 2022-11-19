@@ -1,13 +1,10 @@
 #pragma once
 
 
-
-
-#include <vector> 
+#include <vector>
 #include "cryptoTools/Common/Defines.h"
 #include "util.h"
 
 
-void EcdhSend(LaunchParams& params);
-void EcdhRecv(LaunchParams& params);
-
+void EcdhSend(LaunchParams &params);
+void EcdhRecv(LaunchParams &params);

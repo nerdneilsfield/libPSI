@@ -8,26 +8,26 @@
 #include <thread>
 #include <NTL/BasicThreadPool.h>
 #include <omp.h>
-namespace osuCrypto
+namespace osuCrypto {
+#define LEFT(X) (2 * X + 1)
+#define RIGHT(X) (2 * X + 2)
+#define PAPA(X) ((X - 1) / 2)
+
+
+void polyFFT2::init(ZZ &prime, u64 numThreads)
 {
-#define LEFT(X) (2*X+1)
-#define RIGHT(X) (2*X+2)
-#define PAPA(X) ((X-1)/2)
-
-
-	void polyFFT2::init(ZZ &prime, u64 numThreads) {
-		mPrime = prime;
-		mNumThreads = numThreads;
-	}
-
-	void build_tree_1thread(ZZ_pX* tree, ZZ_p* points) {
-
-	}
-
-
-	void polyFFT2::build_tree(ZZ_pX* tree, ZZ_p* points) {
-
-	}
-
+  mPrime = prime;
+  mNumThreads = numThreads;
 }
+
+void build_tree_1thread(ZZ_pX *tree, ZZ_p *points)
+{
+}
+
+
+void polyFFT2::build_tree(ZZ_pX *tree, ZZ_p *points)
+{
+}
+
+}// namespace osuCrypto
 #endif

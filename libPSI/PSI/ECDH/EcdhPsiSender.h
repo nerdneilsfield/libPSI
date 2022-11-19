@@ -9,27 +9,25 @@
 #include "cryptoTools/Crypto/PRNG.h"
 
 
-
-namespace osuCrypto
+namespace osuCrypto {
+class EcdhPsiSender
 {
-    class EcdhPsiSender
-    {
-    public:
-        EcdhPsiSender();
-        ~EcdhPsiSender();
+public:
+  EcdhPsiSender();
+  ~EcdhPsiSender();
 
 
-        u64 mN, mSecParam;
-        PRNG mPrng;
+  u64 mN, mSecParam;
+  PRNG mPrng;
 
-        void init(u64 n, u64 secParam, block seed);
-        //void init(u64 n, u64 statSecParam);
+  void init(u64 n, u64 secParam, block seed);
+  // void init(u64 n, u64 statSecParam);
 
 
-        void sendInput(std::vector<block>& inputs, span<Channel> chl);
-        //void sendInput(std::vector<block>& inputs, std::vector<Channel*>& chl);
-    };
+  void sendInput(std::vector<block> &inputs, span<Channel> chl);
+  // void sendInput(std::vector<block>& inputs, std::vector<Channel*>& chl);
+};
 
-}
+}// namespace osuCrypto
 
 #endif

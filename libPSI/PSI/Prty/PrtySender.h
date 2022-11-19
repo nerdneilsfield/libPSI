@@ -1,5 +1,5 @@
 #pragma once
-// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use.  
+// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use.
 #include "libPSI/config.h"
 #ifdef ENABLE_PRTY_PSI
 
@@ -24,46 +24,42 @@
 #include <array>
 namespace osuCrypto {
 
-	class PrtySender :public TimerAdapter
-	{
-	public:
+class PrtySender : public TimerAdapter
+{
+public:
+  SimpleIndex simple;
 
-		SimpleIndex simple;
+  bool mHasBase;
 
-		bool mHasBase;
+  u64 mMyInputSize, mTheirInputSize, mPolyNumBytes, mPolyDegree, mStepSize, mPsiSecParam;
+  std::vector<block> mS;
+  KkrtNcoOtReceiver recvOprf;
+  KkrtNcoOtSender sendOprf;// PQET
 
-		u64 mMyInputSize, mTheirInputSize, mPolyNumBytes, mPolyDegree, mStepSize, mPsiSecParam;
-		std::vector<block> mS;
-		KkrtNcoOtReceiver recvOprf;
-		KkrtNcoOtSender sendOprf; //PQET
-		
-		u64 mFieldSize;
-		ZZ mPrime;
-		ZZ mPrimeLastSlice;
-
+  u64 mFieldSize;
+  ZZ mPrime;
+  ZZ mPrimeLastSlice;
 
 
-		block mTruncateBlk;
+  block mTruncateBlk;
 
 
-		PRNG mPrng;
-		
-		BitVector mOtChoices;
-		std::vector<AES> mAesQ;
+  PRNG mPrng;
 
-		u64 idxPermuteDoneforDebug, hashIdxforDebug;
-		AES mAesHasher;
+  BitVector mOtChoices;
+  std::vector<AES> mAesQ;
 
-		std::array<block, numSuperBlocks > subRowQForDebug;
-		
+  u64 idxPermuteDoneforDebug, hashIdxforDebug;
+  AES mAesHasher;
 
-		void init(u64 myInputSize, u64 theirInputSize, u64 psiSecParam, PRNG& prng, span<Channel> chls);
-		void output(span<block> inputs, span<Channel> chls);
-		void outputBestComm(span<block> inputs, span<Channel> chls);
-		void outputBigPoly(span<block> inputs, span<Channel> chls);
-		
-	
-	};
-}
+  std::array<block, numSuperBlocks> subRowQForDebug;
+
+
+  void init(u64 myInputSize, u64 theirInputSize, u64 psiSecParam, PRNG &prng, span<Channel> chls);
+  void output(span<block> inputs, span<Channel> chls);
+  void outputBestComm(span<block> inputs, span<Channel> chls);
+  void outputBigPoly(span<block> inputs, span<Channel> chls);
+};
+}// namespace osuCrypto
 
 #endif

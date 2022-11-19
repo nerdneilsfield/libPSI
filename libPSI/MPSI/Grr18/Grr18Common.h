@@ -7,22 +7,21 @@
 #include <cryptoTools/Crypto/PRNG.h>
 #include "libPSI/Tools/SimpleHasher.h"
 
-namespace osuCrypto
-{
+namespace osuCrypto {
 
-    extern bool mGrr18PrintWarning;
+extern bool mGrr18PrintWarning;
 
-    u64 computeLoads(
-        std::vector<u8>& loads,
-        PRNG & prng,
-        u64 binStart,
-        bool oneSided,
-        bool lapPlusBuffer,
-        u64 n,
-        SimpleHasher& bins,
-        double eps,
-        i64 cwThreshold = -1,
-        bool print = false);
+u64 computeLoads(
+  std::vector<u8> &loads,
+  PRNG &prng,
+  u64 binStart,
+  bool oneSided,
+  bool lapPlusBuffer,
+  u64 n,
+  SimpleHasher &bins,
+  double eps,
+  i64 cwThreshold = -1,
+  bool print = false);
 
-}
+}// namespace osuCrypto
 #endif

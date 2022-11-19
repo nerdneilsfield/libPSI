@@ -1,5 +1,5 @@
 #pragma once
-// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use. 
+// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use.
 #include "libPSI/config.h"
 #ifdef ENABLE_PRTY_PSI
 
@@ -19,49 +19,44 @@
 
 using namespace NTL;
 
-namespace osuCrypto
+namespace osuCrypto {
+
+class PrtyReceiver : public TimerAdapter
 {
+public:
+  bool mHasBase;
+  BalancedIndex mBalance;
 
-    class PrtyReceiver : public TimerAdapter
-    {
-    public:
-     
-		
-		bool mHasBase;
-		BalancedIndex mBalance;
+  u64 mMyInputSize, mTheirInputSize, mPolyNumBytes, mPolyDegree, mPsiSecParam;
+  std::vector<block> mS;
+  KkrtNcoOtSender sendOprf;
+  KkrtNcoOtReceiver recvOprf;
+  u64 mFieldSize;
 
-		u64 mMyInputSize, mTheirInputSize, mPolyNumBytes, mPolyDegree, mPsiSecParam;
-		std::vector<block> mS;
-		KkrtNcoOtSender sendOprf;
-		KkrtNcoOtReceiver recvOprf;
-		u64 mFieldSize;
+  block mTruncateBlk;
 
-		block mTruncateBlk;
+  PRNG mPrng;
+  ZZ mPrime;
+  ZZ mPrimeLastSlice;
 
-		PRNG mPrng;
-		ZZ mPrime;
-		ZZ mPrimeLastSlice;
+  ////std::vector<std::array<block, 2>> mOtKeys;
+  std::vector<AES> mAesT;
+  std::vector<AES> mAesU;
+  std::vector<u64> mIntersection;// index
 
-		////std::vector<std::array<block, 2>> mOtKeys;
-		std::vector<AES> mAesT;
-		std::vector<AES> mAesU;
-		std::vector<u64> mIntersection; //index
+  block recvMaskForDebug;
+  // AES mAesHasher;
 
-		block recvMaskForDebug;
-		//AES mAesHasher;
+  std::array<block, numSuperBlocks> subRowTForDebug;
+  std::array<block, numSuperBlocks> subRowUForDebug;
 
-		std::array<block, numSuperBlocks> subRowTForDebug;
-		std::array<block, numSuperBlocks> subRowUForDebug;
+  std::vector<block> Outputs;
 
-		std::vector<block> Outputs;
+  void init(u64 myInputSize, u64 theirInputSize, u64 psiSecParam, PRNG &prng, span<Channel> chls);
+  void output(span<block> inputs, span<Channel> chls);
+  void outputBestComm(span<block> inputs, span<Channel> chls);
+  void outputBigPoly(span<block> inputs, span<Channel> chls);
+};
 
-		void init(u64 myInputSize, u64 theirInputSize, u64 psiSecParam, PRNG& prng, span<Channel> chls);
-		void output(span<block> inputs, span<Channel> chls);
-		void outputBestComm(span<block> inputs, span<Channel> chls);
-		void outputBigPoly(span<block> inputs, span<Channel> chls);
-
-		
-    };
-
-}
+}// namespace osuCrypto
 #endif

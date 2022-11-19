@@ -1,42 +1,40 @@
 #pragma once
 
 
-
-
-#include <vector> 
+#include <vector>
 #include "cryptoTools/Common/Defines.h"
 
 
-//void otBin();
+// void otBin();
 void rr17aRecv(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void rr17aSend(
-    LaunchParams& params);
+  LaunchParams &params);
 
 
-//void otBin();
+// void otBin();
 void rr17aRecv_StandardModel(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void rr17aSend_StandardModel(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void rr17bRecv(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void rr17bSend(
-    LaunchParams& params);
+  LaunchParams &params);
 
 
 void kkrtRecv(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void kkrtSend(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void grr18Recv(
-    LaunchParams& params);
+  LaunchParams &params);
 
 void grr18Send(
-    LaunchParams& params);
+  LaunchParams &params);

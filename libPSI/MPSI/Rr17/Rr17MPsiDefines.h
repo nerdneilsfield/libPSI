@@ -1,9 +1,8 @@
 #pragma once
 #include "cryptoTools/Common/Defines.h"
 
-namespace osuCrypto
-{
+namespace osuCrypto {
 
 
-    static const u64 stepSize(512);
+static const u64 stepSize(512);
 }

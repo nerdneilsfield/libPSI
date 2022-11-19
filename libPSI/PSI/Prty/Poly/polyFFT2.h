@@ -1,5 +1,5 @@
 #pragma once
-// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use. 
+// This file and the associated implementation has been placed in the public domain, waiving all copyright. No restrictions are placed on its use.
 #include "libPSI/config.h"
 #ifdef ENABLE_PRTY_PSI
 
@@ -9,7 +9,7 @@
 #include <cryptoTools/Common/BitVector.h>
 #include <cryptoTools/Common/Timer.h>
 #include <chrono>
-//#include <sys/resource.h>
+// #include <sys/resource.h>
 #include <iostream>
 
 #include <NTL/ZZ_p.h>
@@ -19,29 +19,26 @@
 #include <vector>
 
 
+namespace osuCrypto {
+using ZZ_pX = NTL::ZZ_pX;
+using ZZ = NTL::ZZ;
+using ZZ_p = NTL::ZZ_p;
 
-namespace osuCrypto
+class polyFFT2 : public TimerAdapter
 {
-	using ZZ_pX = NTL::ZZ_pX;
-	using ZZ = NTL::ZZ;
-	using ZZ_p = NTL::ZZ_p;
+public:
+  struct node
+  {
+    ZZ_pX data;
+    struct node *left;
+    struct node *right;
+  };
 
-	class polyFFT2 : public TimerAdapter
-	{
-	public:
-		struct node
-		{
-			ZZ_pX data;
-			struct node* left;
-			struct node* right;
-		};
+  ZZ mPrime;
+  u64 mNumThreads;
+  void init(ZZ &prime, u64 numThreads);
+  void build_tree(ZZ_pX *tree, ZZ_p *points);
+};
 
-		ZZ mPrime;
-		u64 mNumThreads;
-		void init(ZZ &prime, u64 numThreads);
-		void build_tree(ZZ_pX* tree, ZZ_p* points);
-
-	};
-
-}
+}// namespace osuCrypto
 #endif

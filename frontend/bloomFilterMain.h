@@ -3,5 +3,5 @@
 
 #include "util.h"
 
-void bfSend(LaunchParams& params);
-void bfRecv(LaunchParams& params);
+void bfSend(LaunchParams &params);
+void bfRecv(LaunchParams &params);

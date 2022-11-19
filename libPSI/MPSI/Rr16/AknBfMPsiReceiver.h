@@ -12,33 +12,32 @@
 #include "libOTe/NChooseK/AknOtReceiver.h"
 
 
-namespace osuCrypto
+namespace osuCrypto {
+
+void computeAknBfParams(u64 n, u64 statSecParam, u64 &totalOtCount, u64 &totalOnesCount, u64 &cncOnesThreshold, double &cncProb, u64 &numHashFunctions, u64 &bfBitCount);
+
+
+class AknBfMPsiReceiver : public TimerAdapter
 {
+public:
+  typedef u32 LogOtCount_t;
 
-    void computeAknBfParams(u64 n, u64 statSecParam, u64& totalOtCount, u64& totalOnesCount, u64& cncOnesThreshold, double& cncProb, u64& numHashFunctions, u64& bfBitCount);
 
+  AknBfMPsiReceiver();
+  ~AknBfMPsiReceiver();
 
-    class AknBfMPsiReceiver : public TimerAdapter
-    {
-    public:
-        typedef u32 LogOtCount_t;
+  AknOtReceiver mAknOt;
+  // SHA1 mHash;
+  u64 mMyInputSize, mTheirInputSize, mBfBitCount, mStatSecParam, mTotalOtCount, mNumHashFunctions;
+  block mHashingSeed, mSeed;
+  std::vector<u64> mIntersection;
 
-        
-        AknBfMPsiReceiver();
-        ~AknBfMPsiReceiver();
+  void init(u64 n, u64 statSecParam, OtExtReceiver &otExt, Channel &chl0, block seed);
+  void init(u64 n, u64 statSecParam, OtExtReceiver &otExt, span<Channel> chl0, block seed);
+  void sendInput(std::vector<block> &inputs, Channel &chl);
+  void sendInput(std::vector<block> &inputs, span<Channel> chl0);
+};
 
-        AknOtReceiver mAknOt;
-        //SHA1 mHash;
-        u64 mMyInputSize, mTheirInputSize, mBfBitCount, mStatSecParam, mTotalOtCount, mNumHashFunctions;
-        block mHashingSeed, mSeed;
-        std::vector<u64> mIntersection;
-
-        void init(u64 n, u64 statSecParam, OtExtReceiver& otExt, Channel& chl0, block seed);
-        void init(u64 n, u64 statSecParam, OtExtReceiver& otExt, span<Channel> chl0, block seed);
-        void sendInput(std::vector<block>& inputs, Channel& chl);
-        void sendInput(std::vector<block>& inputs, span<Channel> chl0);
-    };
-
-}
+}// namespace osuCrypto
 
 #endif
