@@ -22,7 +22,7 @@ cd libPSI
 make 
 
 # test
-make test-all
+make test_all
 
 # clean
 make clean

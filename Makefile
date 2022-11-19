@@ -14,6 +14,13 @@ create_dir:
 	mkdir -p out/build/linux
 	mkdir -p out/install/linux
 
+format:
+	find libPSI -regex '.*\.\(cpp\|h\|hpp\|cc\|cxx\)' -exec clang-format -style=file -i {} \;
+	find libPSI_Tests -regex '.*\.\(cpp\|h\|hpp\|cc\|cxx\)' -exec clang-format -style=file -i {} \;
+	find frontend -regex '.*\.\(cpp\|h\|hpp\|cc\|cxx\)' -exec clang-format -style=file -i {} \;
+	find cmake -regex '.*\.\(cmake\)' -exec cmake-format -c .cmake-format.yaml -i {} \;
+	cmake-format -c .cmake-format.yaml -i CMakeLists.txt
+
 clean:
 	echo "-------clean--------"
 	rm -rf out/*

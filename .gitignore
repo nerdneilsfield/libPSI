@@ -2,3 +2,7 @@
 out/
 CMakeSettings.json
 thirdparty/
+
+compile_commands.json
+.cache/
+build/
