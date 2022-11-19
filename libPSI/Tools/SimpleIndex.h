@@ -30,7 +30,7 @@ class SimpleIndex
 public:
   struct Item
   {
-    Item() : mVal(-1) {}
+    Item() : mVal(-1ul) {}
 
     Item &operator=(const Item &) = default;
 

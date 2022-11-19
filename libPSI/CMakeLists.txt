@@ -14,7 +14,7 @@ target_link_libraries(
   libPSI
   PUBLIC oc::libOTe
          sparsehash
-         project_warnings
+        #  project_warnings
          project_options)
 
 target_include_directories(libPSI PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..> $<INSTALL_INTERFACE:>)
